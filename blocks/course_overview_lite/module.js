@@ -7,6 +7,11 @@ M.block_course_overview_lite.init = function(Y) {
 
 M.block_course_overview_lite.add_handles = function(Y) {
     M.block_course_overview_lite.Y = Y;
+
+    Y.one('#course_list').all('.hide_course').each(function(node){
+        node.on('click', M.block_course_overview_lite.hide);
+    });
+
     YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         //Static Vars
         var goingUp = false, lastY = 0;
@@ -121,13 +126,41 @@ M.block_course_overview_lite.save = function() {
     });
 }
 
-M.block_course_overview_lite.ajax = {
-
-    ajaxLoad: function(e) {
-        var Y = M.block_course_overview_lite.Y;
-        var params = {
-            sesskey : M.cfg.sesskey
+M.block_course_overview_lite.hide = function(e) {
+    var Y = M.block_course_overview_lite.Y,
+        id = this.get("id"),
+        params = {
+            sesskey : M.cfg.sesskey,
+            toggle_hidden : id
         };
+    Y.io(M.cfg.wwwroot + '/blocks/course_overview_lite/save_hide.php', {
+        method: 'POST',
+        data: build_querystring(params),
+        context: this,
+        on: {
+           complete: function() {
+
+               var parent = Y.one('.block_course_overview_lite #course_list #course-' + id);
+               var img = this.one('img');
+               if (parent.hasClass('userhidden')) {
+                   img.set('src',  M.util.image_url('i/hide', 'moodle'));
+               } else {
+                   img.set('src',  M.util.image_url('i/show', 'moodle'));
+               }
+               parent.toggleClass('userhidden');
+           }
+        }
+    });
+}
+
+M.block_course_overview_lite.ajax = {
+    ajaxLoad: function(e) {
+        var Y = M.block_course_overview_lite.Y,
+            editMode = Y.one('#course_list').hasClass('ajax-edit'),
+            params = {
+                sesskey : M.cfg.sesskey,
+                edit: editMode
+            };
         Y.io(M.cfg.wwwroot + '/blocks/course_overview_lite/getcourses.php', {
             method:'GET',
             data:  build_querystring(params),
@@ -143,7 +176,6 @@ M.block_course_overview_lite.ajax = {
             try {
                 YUI().use('json-parse', 'json-stringify', function (Y) {
                     var object = Y.JSON.parse(outcome.responseText);
-                    console.log(object);
                     M.block_course_overview_lite.renderer.loadCourses(object);
                 });
             } catch (ex) {
@@ -163,10 +195,17 @@ M.block_course_overview_lite.renderer = {
     drawCourse: function(course, edit) {
         var move = Y.Node.create('<div class="move">' + '<img src="' + M.util.image_url('i/move_2d', 'moodle') + '" ' +
                 'class="cursor" alt="' + M.str.moodle.move + '" title="' + M.str.moodle.move + '"/></div>');
-        var box = Y.Node.create('<div id="course-' + course.id + '" class="box coursebox"></div>');
+        var img = course.userhidden ? 'i/show' : 'i/hide';
+        var hide = Y.Node.create('<div class="hide_course" id="' + course.id + '">' + '<img src="' + M.util.image_url(img, 'moodle') + '" ' +
+            'class="hide_icon" alt="' + M.str.block_course_overview_lite.hide_icon_alt + '" align="right"' +
+            ' title="' + M.str.block_course_overview_lite.hide_icon_alt + '"/></div>');
+        var box = Y.Node.create('<div id="course-' + course.id + '" class="box coursebox ' + (course.userhidden ? 'userhidden' : '') + '"></div>');
         var title = Y.Node.create('<div class="course_title"></div>');
         var link = Y.Node.create('<h3 class="title"><a href="' + course.url + '" title="' + course.fullname + '">' + course.fullname + '</a></h3>');
-        if (edit) { title.appendChild(move); }
+        if (edit) {
+            title.appendChild(move);
+            title.appendChild(hide);
+        }
         title.appendChild(link);
         title.appendChild(Y.Node.create('<div class="box flush"></div>'));
         box.appendChild(title);
@@ -186,6 +225,9 @@ M.block_course_overview_lite.renderer = {
             for (var key in object) {
                 if (object.hasOwnProperty(key)) {
                     var course = object[key];
+                    if (course.userhidden && !edit) {
+                        continue;
+                    }
                     M.block_course_overview_lite.renderer.drawCourse(course, edit);
                 }
             }

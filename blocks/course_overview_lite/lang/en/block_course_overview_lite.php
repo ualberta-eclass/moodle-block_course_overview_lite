@@ -37,6 +37,7 @@ $string['hiddencoursecount'] = 'You have {$a} hidden course';
 $string['hiddencoursecountplural'] = 'You have {$a} hidden courses';
 $string['highlightprefix'] = 'Highlight prefix';
 $string['highlightprefixdesc'] = 'Prefix to identify which courses to highlight based on the course short name.';
+$string['hide_icon_alt'] = 'Toggle course visibility in this block.';
 $string['movecoursehere'] = 'Move course here';
 $string['numtodisplay'] = 'Number of courses to display: ';
 $string['pluginname'] = 'eClass Overview';

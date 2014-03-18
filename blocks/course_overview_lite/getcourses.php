@@ -31,38 +31,28 @@ require_once(dirname(__FILE__) . '/../../config.php');
 /* Include course lib for its functions */
 require_once($CFG->dirroot.'/blocks/course_overview_lite/locallib.php');
 
+require_sesskey();
+require_login();
+
+$edit = optional_param('edit', false, PARAM_BOOL);
+
 try {
     // Start buffer capture so that we can remove any errors.
     ob_start();
-    $courses = array();
     $json = array();
     if (confirm_sesskey()) {
-        $highlightprefix = get_config('block_course_overview_lite', 'highlightprefix');
-        $rawcourses = enrol_get_my_courses('id, shortname, fullname, modinfo, sectioncache');
-        foreach ($rawcourses as $rawcourse) {
-            $course = new stdClass();
-            $course->id = $rawcourse->id;
-            $course->fullname = $rawcourse->fullname;
-            $course->shortname = $rawcourse->shortname;
-            $url = new moodle_url('/course/view.php', array('id' => $rawcourse->id));
-            $course->url = $url->out();
-            $course->hidden = $rawcourse->visible == 0;
-            $course->current = (!empty($highlightprefix) &&
-                block_course_overview_lite_current($highlightprefix, $rawcourse->shortname));
-            $courses[$rawcourse->id] = $course;
-        }
-        $json = block_course_overview_lite_sort_courses($courses);
+        list($json, $totalcourses, $numhidden, $ajax) = block_course_overview_lite_get_sorted_courses(false);
     }
     // Stop buffering errors at this point.
     $html = ob_get_contents();
     ob_end_clean();
 } catch (Exception $e) {
-    die('Error: '.$e->getMessage());
+    die(json_encode(array('error' => 'Exception raised', 'data' => $e->getMessage())));
 }
 
 // Check if the buffer contained anything if it did ERROR!
 if (trim($html) !== '') {
-    die('Errors were encountered while producing the course list'."\n\n\n".$html);
+    die(json_encode(array('error' => 'Errors were encountered while producing the course list', 'data' => $html)));
 }
 header('Content-type: text/json; charset=utf-8');
 // Output json.

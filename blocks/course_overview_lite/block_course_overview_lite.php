@@ -35,6 +35,12 @@ class block_course_overview_lite extends block_base {
      */
     public function init() {
         $this->title = get_string('pluginname', 'block_course_overview_lite');
+
+        if (is_null(get_user_preferences('course_overview_lite_courses_hidden')) &&
+            !is_null($userpref = get_user_preferences('eclass_course_overview_courses_hidden'))) {
+            $hiddencourses = unserialize($userpref);
+            block_course_overview_lite_update_courses_hidden($hiddencourses);
+        }
     }
 
     /**
@@ -43,7 +49,7 @@ class block_course_overview_lite extends block_base {
      * @return stdClass contents of block
      */
     public function get_content() {
-        global $USER, $CFG;
+        global $CFG;
         require_once($CFG->dirroot.'/user/profile/lib.php');
 
         if ($this->content !== null) {
@@ -61,7 +67,7 @@ class block_course_overview_lite extends block_base {
             block_course_overview_lite_update_mynumber($updatemynumber);
         }
 
-        list($sortedcourses, $totalcourses, $ajax) = block_course_overview_lite_get_sorted_courses();
+        list($sortedcourses, $numcourses, $numhidden, $ajax) = block_course_overview_lite_get_sorted_courses();
 
         $renderer = $this->page->get_renderer('block_course_overview_lite');
         if (!empty($config->showwelcomearea) && !empty($config->welcomeareatext)) {
@@ -70,14 +76,14 @@ class block_course_overview_lite extends block_base {
 
         // Number of sites to display.
         if ($this->page->user_is_editing() && empty($config->forcedefaultmaxcourses)) {
-            $this->content->text .= $renderer->editing_bar_head($totalcourses);
+            $this->content->text .= $renderer->editing_bar_head($numcourses);
         }
 
         if (empty($sortedcourses) && !$ajax) {
             $this->content->text .= get_string('nocourses', 'my');
         } else {
             $this->content->text .= $renderer->course_overview($sortedcourses, $ajax);
-            $this->content->text .= $renderer->hidden_courses($totalcourses - count($sortedcourses));
+            $this->content->text .= $renderer->hidden_courses($numhidden);
             $this->page->requires->js_init_call('M.block_course_overview_lite.init');
             if ($this->page->user_is_editing() && ajaxenabled()) {
                 $this->page->requires->js_init_call('M.block_course_overview_lite.add_handles');

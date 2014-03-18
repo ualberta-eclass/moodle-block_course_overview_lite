@@ -38,22 +38,26 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
      * @return string html to be displayed in course_overview block
      */
     public function course_overview($courses, $ajax) {
+        $editclass = $this->page->user_is_editing() ? 'ajax-edit' : '';
         $html = '';
         $html .= html_writer::start_tag('div', array('id' => 'course_list_header'));
         $html .= html_writer::tag('span', get_string('currentcourses', 'block_course_overview_lite'),
             array('id' => 'course_overview_lite_legend', 'class' => 'currentcourse'));
         $html .= html_writer::end_tag('div');
-        $html .= html_writer::start_tag('div', array('id' => 'course_list'));
+
+        $html .= html_writer::start_tag('div', array('id' => 'course_list', 'class' => $editclass));
         $courseordernumber = 0;
         $maxcourses = count($courses);
         // Intialize string/icon etc if user is editing.
         $url = null;
+        $hideurl = null;
         $moveicon = null;
+        $hideicon = null;
+        $showicon = null;
         $moveup[] = null;
         $movedown[] = null;
 
         if ($ajax && empty($courses)) {
-            $editclass = $this->page->user_is_editing() ? 'ajax-edit' : '';
             $html .= html_writer::tag('div', html_writer::empty_tag('img',
                 array('src' => $this->pix_url('i/loading')->out(false))
             ), array('id' => 'ajaxcourse', 'class' => $editclass));
@@ -69,18 +73,50 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
                     );
                 } else {
                     $url = new moodle_url('/blocks/course_overview_lite/move.php', array('sesskey' => sesskey()));
+                    $hideurl = new moodle_url('/blocks/course_overview_lite/hide.php', array('sesskey' => sesskey()));
                     $moveup['str'] = get_string('moveup');
                     $moveup['icon'] = $this->pix_url('t/up');
                     $movedown['str'] = get_string('movedown');
                     $movedown['icon'] = $this->pix_url('t/down');
                 }
+                $hideicon = html_writer::empty_tag('img',
+                    array('src' => $this->pix_url('i/hide')->out(false),
+                        'alt' => get_string('hide_icon_alt',
+                            'block_course_overview_lite'),
+                        'class' => 'hide_icon',
+                        'align' => 'right',
+                        'title' => get_string('hide_icon_alt',
+                            'block_course_overview_lite')
+                    )
+                );
+                $showicon = html_writer::empty_tag('img',
+                    array('src' => $this->pix_url('i/show')->out(false),
+                        'alt' => get_string('hide_icon_alt',
+                            'block_course_overview_lite'),
+                        'class' => 'hide_icon',
+                        'align' => 'right',
+                        'title' => get_string('hide_icon_alt',
+                            'block_course_overview_lite')
+                    )
+                );
             }
         }
 
         foreach ($courses as $key => $course) {
+            // If the course is hidden, set its class to 'dimmed'.
+            if ($course->userhidden) {
+                if (!$this->page->user_is_editing()) {
+                    continue;
+                }
+                $classvisibility = " userhidden";
+            } else {
+                $classvisibility = "";
+            }
             $class = $course->current ? 'coursebox currentcourse' : 'coursebox';
+            $class .= $classvisibility;
             $html .= $this->output->box_start($class, "course-{$course->id}");
             $html .= html_writer::start_tag('div', array('class' => 'course_title'));
+
             // Ajax enabled then add moveicon html.
             if (!is_null($moveicon)) {
                 $html .= $moveicon;
@@ -114,6 +150,25 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
                 $html .= html_writer::end_tag('div');
             }
 
+            // Add hide icon to each course..
+            if ($this->page->user_is_editing()) {
+                if ($course->userhidden) {
+                    $icon = $showicon;
+                } else {
+                    $icon = $hideicon;
+                }
+                if (!is_null($icon)) {
+                    $html .= html_writer::start_tag('div', array("class" => "hide_course", "id" => $course->id));
+                    if (is_null($hideurl)) {
+                        $html .= $icon;
+                    } else {
+                        $hideurl->param('toggle_hidden', $course->id);
+                        $html .= html_writer::link($hideurl, $icon);
+                    }
+                    $html .= html_writer::end_tag('div');
+                }
+            }
+
             $attributes = array('title' => s($course->fullname));
             if ($course->id > 0) {
                 $coursefullname = format_string($course->fullname, true, $course->id);
@@ -121,6 +176,7 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
                 $link = html_writer::link($course->url, $coursefullname, $attributes);
                 $html .= $this->output->heading($link, 3, 'title');
             }
+
             $html .= $this->output->box('', 'flush');
             $html .= html_writer::end_tag('div');
 
