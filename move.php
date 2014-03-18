@@ -30,8 +30,13 @@ require_login();
 $source = required_param('source', PARAM_INT);
 $move = required_param('move', PARAM_INT);
 
-list($coursessorted, $sitecourses, $coursecount) = block_course_overview_lite_get_sorted_courses();
-$sortorder = array_keys($coursessorted);
+list($sortedcourses, $numcourses, $numhidden, $ajax) = block_course_overview_lite_get_sorted_courses(false);
+$sortorder = array();
+
+foreach ($sortedcourses as $key => $course) {
+    $sortorder[] = $course->id;
+}
+
 // Now resort based on new weight for chosen course.
 $neworder = array();
 
@@ -43,7 +48,7 @@ if ($sourcekey === false) {
 $destination = $sourcekey + $move;
 if ($destination < 0) {
     print_error("listcantmoveup");
-} else if ($destination >= count($coursessorted)) {
+} else if ($destination >= count($sortedcourses)) {
     print_error("listcantmovedown");
 }
 
@@ -61,7 +66,7 @@ if ($move == -1) {
 } else if (($move == 1)) {
     $neworder = array_slice($sortorder, 0, $destination);
     $neworder[] = $source;
-    if (($destination) < count($coursessorted)) {
+    if (($destination) < count($sortedcourses)) {
         $remaningcourses = array_slice($sortorder, $destination);
         foreach ($remaningcourses as $courseid) {
             $neworder[] = $courseid;
