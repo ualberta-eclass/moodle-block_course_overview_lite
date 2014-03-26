@@ -21,7 +21,15 @@
  * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+function block_course_overview_lite_get_overviews($courses) {
+    $htmlarray = array();
+    if ($modules = get_plugin_list_with_function('mod', 'print_overview')) {
+        foreach ($modules as $fname) {
+            $fname($courses, $htmlarray);
+        }
+    }
+    return $htmlarray;
+}
 /**
  * Sets user preference for maximum courses to be displayed in course_overview block
  *
@@ -72,6 +80,7 @@ function block_course_overview_lite_get_sorted_courses($usenav = true) {
     $courses = array();
     $ajax = false;
     $highlightprefix = get_config('block_course_overview_lite', 'highlightprefix');
+    $highlightdelim = get_config('block_course_overview_lite', 'highlightdelim');
     $hiddencourses = block_course_overview_lite_get_courses_hidden();
 
     if ($usenav) {
@@ -93,8 +102,10 @@ function block_course_overview_lite_get_sorted_courses($usenav = true) {
                         $course->shortname = $coursenode->shorttext;
                         $course->url = $coursenode->action;
                         $course->hidden = $coursenode->hidden;
+                        $course->modinfo = '';
+                        $course->sectioncache = '';
                         $course->current = (!empty($highlightprefix) &&
-                            block_course_overview_lite_current($highlightprefix, $course->shortname));
+                            block_course_overview_lite_current($highlightprefix, $highlightdelim, $course->shortname));
                         $course->userhidden = array_key_exists($course->id, $hiddencourses)
                             && ($hiddencourses[$course->id] == true);
                         $courses[$course->id] = $course;
@@ -120,8 +131,10 @@ function block_course_overview_lite_get_sorted_courses($usenav = true) {
                 $url = new moodle_url('/course/view.php', array('id' => $rawcourse->id));
                 $course->url = $url->out();
                 $course->hidden = $rawcourse->visible == 0;
+                $course->modinfo = $rawcourse->modinfo;
+                $course->sectioncache = $rawcourse->sectioncache;
                 $course->current = (!empty($highlightprefix) &&
-                    block_course_overview_lite_current($highlightprefix, $rawcourse->shortname));
+                    block_course_overview_lite_current($highlightprefix, $highlightdelim, $rawcourse->shortname));
                 $course->userhidden = array_key_exists($course->id, $hiddencourses) && ($hiddencourses[$course->id] == true);
                 $courses[$course->id] = $course;
             }
@@ -174,7 +187,16 @@ function block_course_overview_lite_sort_courses($courses) {
 }
 
 
-function block_course_overview_lite_current($prefix, $text) {
+function block_course_overview_lite_current($prefix, $delimiter, $text) {
+    if (!empty($delimiter)) {
+        $prefixs = explode($delimiter , $prefix);
+        foreach ($prefixs as $match) {
+            if (strpos($text, $match) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
     return strpos($text, $prefix) !== false;
 }
 

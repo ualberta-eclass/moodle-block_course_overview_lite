@@ -19,11 +19,41 @@
     width: auto;
 }
 
-.block_course_overview_lite .profilepicture {
-    float: left;
+.block_course_overview_lite .overview-tabs {
+    list-style: none;
+    border: solid #6BA000;
+    border-width: 0 0 5px;
+    margin: 0;
 }
-.dir-rtl.block_course_overview_lite .profilepicture {
-    float:right;
+.block_course_overview_lite .overview-tabs li {
+    display: inline-block;
+    vertical-align: bottom;
+    cursor: pointer;
+}
+.block_course_overview_lite .overview-tabs li div {
+    padding: .4em .75em;
+    font-size: 1em;
+    border: 1px solid #BCBCBC;
+    border-bottom: 0;
+    color: #4B4B4B;
+    background: #e1e1df;
+    -webkit-border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+}
+.block_course_overview_lite .overview-tabs li .selected {
+    background: #88C217;
+    border: 1px solid #6BA000;
+    border-bottom: 0;
+    font-size: 1em;
+    font-weight: bold;
+    -webkit-text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+    -moz-text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+    -webkit-border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+    color: #FFF;
 }
 .block_course_overview_lite .welcome_area {
     width: 100%;
@@ -107,6 +137,9 @@
 .block_course_overview_lite .activity_info {
     clear: both;
 }
+.block_course_overview_lite .hidden_overview {
+    display: none;
+}
 .dir-rtl .block_course_overview_lite .activity_info {
     margin-right: 25px;
 }
@@ -148,6 +181,7 @@
 }
 .block_course_overview_lite #course_list_header {
     height: 2.3em;
+    margin-bottom: 4px;
 }
 .block_course_overview_lite #course_overview_lite_legend {
     float: right;

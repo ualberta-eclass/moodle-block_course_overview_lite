@@ -1,8 +1,10 @@
-M.block_course_overview_lite = {}
+M.block_course_overview_lite = {};
 
 M.block_course_overview_lite.init = function(Y) {
     M.block_course_overview_lite.Y = Y;
     Y.on('available', M.block_course_overview_lite.ajax.ajaxLoad, '#ajaxcourse');
+    Y.one('#course_overview_lite_show_detailed').on('click', M.block_course_overview_lite.overview.show);
+    Y.one('#course_overview_lite_hide_detailed').on('click', M.block_course_overview_lite.overview.hide);
 }
 
 M.block_course_overview_lite.add_handles = function(Y) {
@@ -153,6 +155,68 @@ M.block_course_overview_lite.hide = function(e) {
     });
 }
 
+M.block_course_overview_lite.overview = {
+    loaded: false,
+    hide: function(e) {
+        var Y = M.block_course_overview_lite.Y;
+        Y.one('#course_overview_lite_show_detailed').removeClass('selected');
+        Y.one('#course_overview_lite_hide_detailed').addClass('selected');
+        Y.all('.block_course_overview_lite .activity_info').each(function(node) {
+            node.addClass('hidden_overview');
+        });
+    },
+    show: function(e) {
+        var Y = M.block_course_overview_lite.Y;
+        Y.one('#course_overview_lite_show_detailed').addClass('selected');
+        Y.one('#course_overview_lite_hide_detailed').removeClass('selected');
+        Y.all('.block_course_overview_lite .activity_info').each(function(node) {
+            node.removeClass('hidden_overview');
+        });
+        if (M.block_course_overview_lite.overview.loaded === false) {
+            M.block_course_overview_lite.overview.ajaxLoad(e);
+        }
+    },
+    ajaxLoad: function(e) {
+        var Y = M.block_course_overview_lite.Y,
+            params = {
+                sesskey : M.cfg.sesskey
+            };
+        Y.io(M.cfg.wwwroot + '/blocks/course_overview_lite/getoverviews.php', {
+            method:'GET',
+            data:  build_querystring(params),
+            on: {
+                complete:  M.block_course_overview_lite.overview.ajaxProcessResponse
+            }
+        });
+        return true;
+    },
+    ajaxProcessResponse: function(e, outcome) {
+        var Y = M.block_course_overview_lite.Y;
+        if (outcome.status == 200) {
+            try {
+                YUI().use('json-parse', 'json-stringify', function (Y) {
+                    var object = Y.JSON.parse(outcome.responseText);
+                    if (object.hasOwnProperty('error')) {
+                       object = {};
+                    } else {
+                        M.block_course_overview_lite.overview.loaded = true;
+                    }
+                    M.block_course_overview_lite.renderer.loadOverviews(object);
+                });
+            } catch (ex) {
+                // If we got here then there was an error parsing the result
+                Y.all('.block_course_overview_lite .activity_info').each(function(node) {
+                    node.addClass('hidden_overview');
+                });
+                M.block_course_overview_lite.overview.loaded = false;
+            }
+        } else {
+            M.block_course_overview_lite.overview.loaded = false;
+        }
+        return true;
+    }
+};
+
 M.block_course_overview_lite.ajax = {
     ajaxLoad: function(e) {
         var Y = M.block_course_overview_lite.Y,
@@ -185,10 +249,9 @@ M.block_course_overview_lite.ajax = {
         } else {
             Y.one('#course_list').setHTML("Error loading courses.");
         }
-
         return true;
     }
-}
+};
 
 M.block_course_overview_lite.renderer = {
 
@@ -209,6 +272,8 @@ M.block_course_overview_lite.renderer = {
         title.appendChild(link);
         title.appendChild(Y.Node.create('<div class="box flush"></div>'));
         box.appendChild(title);
+        box.appendChild(Y.Node.create('<div class="activity_info hidden_overview" id="activity-overview-' + course.id + '">' +
+            '<img src="' + M.util.image_url('i/loading_small', 'moodle') + '"/></div>'));
         box.appendChild(Y.Node.create('<div class="box flush"></div>'));
         if (course.current) { box.addClass('currentcourse'); }
         if (course.hidden) { link.addClass('dimmed_text'); }
@@ -236,7 +301,20 @@ M.block_course_overview_lite.renderer = {
             M.block_course_overview_lite.add_handles(Y);
         }
         return true;
+    },
+
+    loadOverviews: function(object) {
+        var Y = M.block_course_overview_lite.Y;
+        Y.all('.activity_info').each(function(node){
+            node.setHTML('');
+        });
+        for (var key in object) {
+            if (object.hasOwnProperty(key)) {
+                var overviews = object[key];
+                Y.one('#activity-overview-' + key).setHTML(overviews)
+            }
+        }
     }
-}
+};
 
 M.block_course_overview_lite.userpref = false;
