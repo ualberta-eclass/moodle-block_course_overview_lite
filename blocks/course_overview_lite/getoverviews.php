@@ -15,15 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is used to deliver a branch from the navigation structure
- * in XML format back to a page from an AJAX call
- *
- * @since 2.0
- * @package core
- * @copyright 2009 Sam Hemelryk
+ * @package eclass-blocks-course-overview-lite
+ * @author joshstagg
+ * @copyright Josh Stagg
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 define('AJAX_SCRIPT', true);
 
 /* Include config */
@@ -34,17 +30,36 @@ require_once($CFG->dirroot.'/blocks/course_overview_lite/locallib.php');
 require_sesskey();
 require_login();
 
-$edit = optional_param('edit', false, PARAM_BOOL);
-
-global $USER;
+global $USER, $PAGE;
 try {
-    // Start buffer capture so that we can remove any errors.
+    //  Start buffer capture so that we can remove any errors.
     ob_start();
+    $PAGE->set_context(context_system::instance());
     $json = array();
     if (confirm_sesskey()) {
-        list($json, $totalcourses, $numhidden, $ajax) = block_course_overview_lite_get_sorted_courses(false);
+        list($courses, $totalcourses, $numhidden, $ajax) = block_course_overview_lite_get_sorted_courses(false);
+        $unsorted = array();
+        foreach ($courses as $key => $c) {
+            if (isset($USER->lastcourseaccess[$c->id])) {
+                $courses[$key]->lastaccess = $USER->lastcourseaccess[$c->id];
+            } else {
+                $courses[$key]->lastaccess = 0;
+            }
+            $unsorted[$c->id] = $courses[$key];
+        }
+        $overviews = block_course_overview_lite_get_overviews($unsorted);
+        foreach ($overviews as $cid => $overview) {
+            $output = '';
+            foreach (array_keys($overview) as $module) {
+                $output .= html_writer::start_tag('div',
+                    array('class' => 'activity_overview'));
+                $output .= $overview[$module];
+                $output .= html_writer::end_tag('div');
+            }
+            $json[$cid] = $output;
+        }
     }
-    // Stop buffering errors at this point.
+    //  Stop buffering errors at this point.
     $html = ob_get_contents();
     ob_end_clean();
 } catch (Exception $e) {

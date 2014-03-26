@@ -30,6 +30,9 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('block_course_overview_lite/forcedefaultmaxcourses',
         new lang_string('forcedefaultmaxcourses', 'block_course_overview_lite'),
         new lang_string('forcedefaultmaxcoursesdesc', 'block_course_overview_lite'), 1, PARAM_INT));
+    $settings->add(new admin_setting_configtext('block_course_overview_lite/highlightdelim',
+        new lang_string('highlightdelim', 'block_course_overview_lite'),
+        new lang_string('highlightdelimdesc', 'block_course_overview_lite'), null));
     $settings->add(new admin_setting_configtext('block_course_overview_lite/highlightprefix',
         new lang_string('highlightprefix', 'block_course_overview_lite'),
         new lang_string('highlightprefixdesc', 'block_course_overview_lite'), null));

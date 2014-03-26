@@ -39,15 +39,19 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
      */
     public function course_overview($courses, $ajax) {
         $editclass = $this->page->user_is_editing() ? 'ajax-edit' : '';
-        $html = '';
-        $html .= html_writer::start_tag('div', array('id' => 'course_list_header'));
+        $html = html_writer::start_tag('div', array('id' => 'course_list_header'));
         $html .= html_writer::tag('span', get_string('currentcourses', 'block_course_overview_lite'),
             array('id' => 'course_overview_lite_legend', 'class' => 'currentcourse'));
+        $tabs = array(html_writer::tag('div', get_string('tabsimple', 'block_course_overview_lite'),
+            array('id' => 'course_overview_lite_hide_detailed', "class" => "selected")),
+            html_writer::tag('div', get_string('tabdetailed', 'block_course_overview_lite'),
+                array('id' => 'course_overview_lite_show_detailed')));
+        $html .= html_writer::alist($tabs, array("class" => "overview-tabs pull-left"));
         $html .= html_writer::end_tag('div');
-
         $html .= html_writer::start_tag('div', array('id' => 'course_list', 'class' => $editclass));
         $courseordernumber = 0;
         $maxcourses = count($courses);
+        $overviews = array();
         // Intialize string/icon etc if user is editing.
         $url = null;
         $hideurl = null;
@@ -100,6 +104,20 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
                     )
                 );
             }
+        }
+
+        if (!ajaxenabled() && !$ajax) {
+            global $USER;
+            $unsorted = array();
+            foreach ($courses as $key => $c) {
+                if (isset($USER->lastcourseaccess[$c->id])) {
+                    $courses[$key]->lastaccess = $USER->lastcourseaccess[$c->id];
+                } else {
+                    $courses[$key]->lastaccess = 0;
+                }
+                $unsorted[$c->id] = $courses[$key];
+            }
+            $overviews = block_course_overview_lite_get_overviews($unsorted);
         }
 
         foreach ($courses as $key => $course) {
@@ -178,6 +196,25 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
             }
 
             $html .= $this->output->box('', 'flush');
+            // Overview box.
+            $html .= html_writer::start_tag('div', array('class' => 'activity_info hidden_overview',
+                'id' => "activity-overview-$course->id"));
+            if (empty($overviews)) {
+                $html .= html_writer::tag('div', html_writer::empty_tag('img',
+                    array('src' => $this->pix_url('i/loading_small')->out(false))
+                ), array('id' => 'ajaxoverview'));
+            } else if (!empty($overviews[$course->id])) {
+                $output = '';
+                foreach (array_keys($overviews[$course->id]) as $module) {
+                    $output .= html_writer::start_tag('div',
+                        array('class' => 'activity_overview'));
+                    $output .= $overviews[$course->id][$module];
+                    $output .= html_writer::end_tag('div');
+                }
+                $html .= $output;
+            }
+            $html .= html_writer::end_tag('div');
+
             $html .= html_writer::end_tag('div');
 
             $html .= $this->output->box('', 'flush');
