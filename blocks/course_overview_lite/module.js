@@ -1,11 +1,13 @@
 M.block_course_overview_lite = {};
 
 M.block_course_overview_lite.init = function(Y) {
-    M.block_course_overview_lite.Y = Y;
-    Y.on('available', M.block_course_overview_lite.ajax.ajaxLoad, '#ajaxcourse');
-    Y.one('#course_overview_lite_show_detailed').on('click', M.block_course_overview_lite.overview.show);
-    Y.one('#course_overview_lite_hide_detailed').on('click', M.block_course_overview_lite.overview.hide);
-}
+    Y.use('io', function(Y) {
+        M.block_course_overview_lite.Y = Y;
+        Y.on('available', M.block_course_overview_lite.ajax.ajaxLoad, '#ajaxcourse');
+        Y.one('#course_overview_lite_show_detailed').on('click', M.block_course_overview_lite.overview.show);
+        Y.one('#course_overview_lite_hide_detailed').on('click', M.block_course_overview_lite.overview.hide);
+    });
+};
 
 M.block_course_overview_lite.add_handles = function(Y) {
     M.block_course_overview_lite.Y = Y;
@@ -109,7 +111,7 @@ M.block_course_overview_lite.add_handles = function(Y) {
             }
         });
     });
-}
+};
 
 M.block_course_overview_lite.save = function() {
     var Y = M.block_course_overview_lite.Y;
@@ -126,7 +128,7 @@ M.block_course_overview_lite.save = function() {
         data: build_querystring(params),
         context: this
     });
-}
+};
 
 M.block_course_overview_lite.hide = function(e) {
     var Y = M.block_course_overview_lite.Y,
@@ -153,7 +155,7 @@ M.block_course_overview_lite.hide = function(e) {
            }
         }
     });
-}
+};
 
 M.block_course_overview_lite.overview = {
     loaded: false,
