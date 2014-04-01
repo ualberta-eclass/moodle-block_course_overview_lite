@@ -307,13 +307,16 @@ M.block_course_overview_lite.renderer = {
 
     loadOverviews: function(object) {
         var Y = M.block_course_overview_lite.Y;
-        Y.all('.activity_info').each(function(node){
+        Y.all('.block_course_overview_lite .activity_info').each(function(node){
             node.setHTML('');
         });
         for (var key in object) {
             if (object.hasOwnProperty(key)) {
                 var overviews = object[key];
-                Y.one('#activity-overview-' + key).setHTML(overviews)
+                var overviewNode = Y.one('.block_course_overview_lite #activity-overview-' + key);
+                if (overviewNode) {
+                    overviewNode.setHTML(overviews)
+                }
             }
         }
     }
