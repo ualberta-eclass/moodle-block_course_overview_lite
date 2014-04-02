@@ -37,7 +37,7 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
      * @param array $courses list of courses in sorted order
      * @return string html to be displayed in course_overview block
      */
-    public function course_overview($courses, $ajax) {
+    public function course_overview($courses, $overviews, $ajax) {
         $editclass = $this->page->user_is_editing() ? 'ajax-edit' : '';
         $html = html_writer::start_tag('div', array('id' => 'course_list_header'));
         $html .= html_writer::tag('span', get_string('currentcourses', 'block_course_overview_lite'),
@@ -51,7 +51,6 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
         $html .= html_writer::start_tag('div', array('id' => 'course_list', 'class' => $editclass));
         $courseordernumber = 0;
         $maxcourses = count($courses);
-        $overviews = array();
         // Intialize string/icon etc if user is editing.
         $url = null;
         $hideurl = null;
@@ -106,20 +105,6 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
             }
         }
 
-        if (!ajaxenabled() && !$ajax) {
-            global $USER;
-            $unsorted = array();
-            foreach ($courses as $key => $c) {
-                if (isset($USER->lastcourseaccess[$c->id])) {
-                    $courses[$key]->lastaccess = $USER->lastcourseaccess[$c->id];
-                } else {
-                    $courses[$key]->lastaccess = 0;
-                }
-                $unsorted[$c->id] = $courses[$key];
-            }
-            $overviews = block_course_overview_lite_get_overviews($unsorted);
-        }
-
         foreach ($courses as $key => $course) {
             // If the course is hidden, set its class to 'dimmed'.
             if ($course->userhidden) {
@@ -130,6 +115,7 @@ class block_course_overview_lite_renderer extends plugin_renderer_base {
             } else {
                 $classvisibility = "";
             }
+
             $class = $course->current ? 'coursebox currentcourse' : 'coursebox';
             $class .= $classvisibility;
             $html .= $this->output->box_start($class, "course-{$course->id}");
