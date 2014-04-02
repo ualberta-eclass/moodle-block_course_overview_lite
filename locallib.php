@@ -216,7 +216,7 @@ function block_course_overview_lite_remove_old_courses_from_hidden_list($hiddenc
             $hiddencourseremoved = true;
         }
     }
-    if ($hiddencourseremoved) {
+    if ($hiddencourseremoved && !is_null(get_user_preferences('course_overview_lite_courses_hidden'))) {
         set_user_preference('course_overview_lite_courses_hidden', serialize($hiddencourses));
     }
 

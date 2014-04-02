@@ -79,10 +79,25 @@ class block_course_overview_lite extends block_base {
             $this->content->text .= $renderer->editing_bar_head($numcourses);
         }
 
+        // Load up the course detailed view info.
+        $overviews = array();
+        if (!ajaxenabled() && !$ajax) {
+            global $USER;
+            $unsorted = enrol_get_my_courses('id, shortname, fullname, modinfo, sectioncache');
+            foreach ($unsorted as $cid => $course) {
+                if (isset($USER->lastcourseaccess[$cid])) {
+                    $course->lastaccess = $USER->lastcourseaccess[$cid];
+                } else {
+                    $course->lastaccess = 0;
+                }
+            }
+            $overviews = block_course_overview_lite_get_overviews($unsorted);
+        }
+
         if (empty($sortedcourses) && !$ajax) {
             $this->content->text .= get_string('nocourses', 'my');
         } else {
-            $this->content->text .= $renderer->course_overview($sortedcourses, $ajax);
+            $this->content->text .= $renderer->course_overview($sortedcourses, $overviews, $ajax);
             $this->content->text .= $renderer->hidden_courses($numhidden);
             $this->page->requires->js_init_call('M.block_course_overview_lite.init');
             if ($this->page->user_is_editing() && ajaxenabled()) {
