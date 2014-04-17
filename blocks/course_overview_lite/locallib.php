@@ -24,8 +24,17 @@
 function block_course_overview_lite_get_overviews($courses) {
     $htmlarray = array();
     if ($modules = get_plugin_list_with_function('mod', 'print_overview')) {
-        foreach ($modules as $fname) {
-            $fname($courses, $htmlarray);
+        // Split courses list into batches with no more than MAX_MODINFO_CACHE_SIZE courses in one batch.
+        // Otherwise we exceed the cache limit in get_fast_modinfo() and rebuild it too often.
+        if (defined('MAX_MODINFO_CACHE_SIZE') && MAX_MODINFO_CACHE_SIZE > 0 && count($courses) > MAX_MODINFO_CACHE_SIZE) {
+            $batches = array_chunk($courses, MAX_MODINFO_CACHE_SIZE, true);
+        } else {
+            $batches = array($courses);
+        }
+        foreach ($batches as $courses) {
+            foreach ($modules as $fname) {
+                $fname($courses, $htmlarray);
+            }
         }
     }
     return $htmlarray;
@@ -122,7 +131,7 @@ function block_course_overview_lite_get_sorted_courses($usenav = true) {
             $PAGE->requires->string_for_js('move', 'moodle');
             $PAGE->requires->string_for_js('hide_icon_alt', 'block_course_overview_lite');
         } else {
-            $rawcourses = enrol_get_my_courses('id, shortname, fullname, modinfo, sectioncache');
+            $rawcourses = enrol_get_my_courses();
             foreach ($rawcourses as $rawcourse) {
                 $course = new stdClass();
                 $course->id = $rawcourse->id;
@@ -131,8 +140,6 @@ function block_course_overview_lite_get_sorted_courses($usenav = true) {
                 $url = new moodle_url('/course/view.php', array('id' => $rawcourse->id));
                 $course->url = $url->out();
                 $course->hidden = $rawcourse->visible == 0;
-                $course->modinfo = $rawcourse->modinfo;
-                $course->sectioncache = $rawcourse->sectioncache;
                 $course->current = (!empty($highlightprefix) &&
                     block_course_overview_lite_current($highlightprefix, $highlightdelim, $rawcourse->shortname));
                 $course->userhidden = array_key_exists($course->id, $hiddencourses) && ($hiddencourses[$course->id] == true);

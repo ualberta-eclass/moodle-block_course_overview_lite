@@ -83,7 +83,7 @@ class block_course_overview_lite extends block_base {
         $overviews = array();
         if (!ajaxenabled() && !$ajax) {
             global $USER;
-            $unsorted = enrol_get_my_courses('id, shortname, fullname, modinfo, sectioncache');
+            $unsorted = enrol_get_my_courses();
             foreach ($unsorted as $cid => $course) {
                 if (isset($USER->lastcourseaccess[$cid])) {
                     $course->lastaccess = $USER->lastcourseaccess[$cid];
