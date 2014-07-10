@@ -18,7 +18,7 @@
  * Move/order course functionality for course_overview block.
  *
  * @package    block_course_overview_lite
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/../../config.php');

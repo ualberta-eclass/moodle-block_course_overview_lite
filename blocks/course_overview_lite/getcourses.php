@@ -19,9 +19,9 @@
  * in XML format back to a page from an AJAX call
  *
  * @since 2.0
- * @package core
- * @copyright 2009 Sam Hemelryk
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_course_overview_lite
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('AJAX_SCRIPT', true);

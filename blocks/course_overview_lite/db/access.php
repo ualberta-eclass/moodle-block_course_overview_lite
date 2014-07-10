@@ -18,7 +18,7 @@
  * Course overview block caps.
  *
  * @package    block_course_overview_lite
- * @copyright  Mark Nelson <markn@moodle.com>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

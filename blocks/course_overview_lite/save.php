@@ -18,7 +18,7 @@
  * Save course order in course_overview block_lite
  *
  * @package    block_course_overview_lite
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define('AJAX_SCRIPT', true);

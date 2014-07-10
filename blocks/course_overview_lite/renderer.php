@@ -18,7 +18,7 @@
  * course_overview block rendrer
  *
  * @package    block_course_overview_lite
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Course_overview block rendrer
  *
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_course_overview_lite_renderer extends plugin_renderer_base {

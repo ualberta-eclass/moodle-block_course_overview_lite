@@ -18,7 +18,7 @@
  * Helper functions for course_overview block
  *
  * @package    block_course_overview_lite
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 function block_course_overview_lite_get_overviews($courses) {
@@ -45,7 +45,7 @@ function block_course_overview_lite_get_overviews($courses) {
  * @param int $number maximum courses which should be visible
  */
 function block_course_overview_lite_update_mynumber($number) {
-    set_user_preference('course_overview_lite_number_of_courses', $number);
+    set_user_preference('block_course_overview_lite_number_of_courses', $number);
 }
 
 /**
@@ -54,11 +54,11 @@ function block_course_overview_lite_update_mynumber($number) {
  * @param array $sortorder sort order of course
  */
 function block_course_overview_lite_update_myorder($sortorder) {
-    set_user_preference('course_overview_lite_course_order', serialize($sortorder));
+    set_user_preference('block_course_overview_lite_course_order', json_encode($sortorder));
 }
 
 function block_course_overview_lite_update_courses_hidden($hiddencourses) {
-    set_user_preference('course_overview_lite_courses_hidden', serialize($hiddencourses));
+    set_user_preference('block_course_overview_lite_courses_hidden', json_encode($hiddencourses));
 }
 
 /**
@@ -73,7 +73,7 @@ function block_course_overview_lite_get_max_user_courses() {
 
     // If max course is not set then try get user preference.
     if (empty($config->forcedefaultmaxcourses)) {
-        $limit = get_user_preferences('course_overview_lite_number_of_courses', $limit);
+        $limit = get_user_preferences('block_course_overview_lite_number_of_courses', $limit);
     }
     return $limit;
 }
@@ -159,8 +159,8 @@ function block_course_overview_lite_sort_courses($courses) {
     // Hard limit the courses to 100 to skip the user pref save error.
     $limit = $limit > 100 ? 100 : $limit;
     $order = array();
-    if (!is_null($usersortorder = get_user_preferences('course_overview_lite_course_order'))) {
-        $order = unserialize($usersortorder);
+    if (!is_null($usersortorder = get_user_preferences('block_course_overview_lite_course_order'))) {
+        $order = json_decode($usersortorder, true);
     }
 
     $sortedcourses = array();
@@ -209,8 +209,8 @@ function block_course_overview_lite_current($prefix, $delimiter, $text) {
 
 function block_course_overview_lite_get_courses_hidden() {
     $hiddencourses = array();
-    if (!is_null($userpref = get_user_preferences('course_overview_lite_courses_hidden'))) {
-        $hiddencourses = unserialize($userpref);
+    if (!is_null($userpref = get_user_preferences('block_course_overview_lite_courses_hidden'))) {
+        $hiddencourses = json_decode($userpref, true);
     }
     return $hiddencourses;
 }
@@ -223,8 +223,8 @@ function block_course_overview_lite_remove_old_courses_from_hidden_list($hiddenc
             $hiddencourseremoved = true;
         }
     }
-    if ($hiddencourseremoved && !is_null(get_user_preferences('course_overview_lite_courses_hidden'))) {
-        set_user_preference('course_overview_lite_courses_hidden', serialize($hiddencourses));
+    if ($hiddencourseremoved && !is_null(get_user_preferences('block_course_overview_lite_courses_hidden'))) {
+        set_user_preference('block_course_overview_lite_courses_hidden', json_encode($hiddencourses));
     }
 
     return $hiddencourses;

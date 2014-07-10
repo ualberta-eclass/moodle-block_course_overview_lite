@@ -24,8 +24,8 @@ within the blocks/course\_overview\_lite/ directory.
 
 ## Tested with
 
-Moodle 2.4
-Moodle 2.6
+* Moodle 2.4
+* Moodle 2.6
 
 ## Repositories
 
@@ -34,6 +34,10 @@ https://github.com/ualberta-eclass/moodle-block_course_overview_lite
 
 Plugin only:
 https://moodle.org/plugins/view.php?plugin=block_course_overview_lite
+
+Based on:
+Course overview (block_course_overview) Copyright 2012 Adam Olley <adam.olley@netspot.com.au>
+eClasss course overview (block_eclass_course_overview) Copyright 2013 Dom Royko <droyko@ualberta.ca>
 
 ## Installation
 
