@@ -17,7 +17,7 @@
 /**
  * Hide/show course functionality for eclass_course_overview block.
  *
- * @package    block_eclass_course_overview
+ * @package    block_course_overview_lite
  * @copyright  2013 Dom Royko <royko@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

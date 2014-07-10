@@ -17,8 +17,8 @@
 /**
  * course_overview block settings
  *
- * @package    block_course_overview
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @package    block_course_overview_lite
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;

@@ -18,7 +18,7 @@
  * Lang strings for course_overview block
  *
  * @package    block_course_overview_lite
- * @copyright  2012 Adam Olley <adam.olley@netspot.com.au>
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -42,7 +42,7 @@ $string['highlightdelimdesc'] = 'Delimiter by which to split the prefix to match
 $string['hide_icon_alt'] = 'Toggle course visibility in this block.';
 $string['movecoursehere'] = 'Move course here';
 $string['numtodisplay'] = 'Number of courses to display: ';
-$string['pluginname'] = 'eClass Overview';
+$string['pluginname'] = 'Course overview lite';
 $string['shortnameprefix'] = 'Includes {$a}';
 $string['shortnamesufixsingular'] = ' (and {$a} other)';
 $string['shortnamesufixprural'] = ' (and {$a} others)';

@@ -18,7 +18,7 @@
  * Version details
  *
  * @package    block_course_overview_lite
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,4 +26,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2014031100;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2012112900;        // Requires this Moodle version.
+$plugin->release   = '1.0 (Build: 2014031100)';
 $plugin->component = 'block_course_overview_lite'; // Full name of the plugin (used for diagnostics).

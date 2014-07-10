@@ -17,8 +17,8 @@
 /**
  * Course overview block
  *
- * @package    block_course_overview
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @package    block_course_overview_lite
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once($CFG->dirroot.'/blocks/course_overview_lite/locallib.php');
@@ -26,7 +26,7 @@ require_once($CFG->dirroot.'/blocks/course_overview_lite/locallib.php');
 /**
  * Course overview block
  *
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @copyright  2014 Josh Stagg <jstagg@ualberta.ca>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_course_overview_lite extends block_base {
@@ -35,11 +35,24 @@ class block_course_overview_lite extends block_base {
      */
     public function init() {
         $this->title = get_string('pluginname', 'block_course_overview_lite');
-
-        if (is_null(get_user_preferences('course_overview_lite_courses_hidden')) &&
+        // Transition old user hidden course preferences
+        if (is_null(get_user_preferences('block_course_overview_lite_courses_hidden')) &&
             !is_null($userpref = get_user_preferences('eclass_course_overview_courses_hidden'))) {
             $hiddencourses = unserialize($userpref);
             block_course_overview_lite_update_courses_hidden($hiddencourses);
+        } else if (is_null(get_user_preferences('block_course_overview_lite_courses_hidden')) &&
+            !is_null($userpref = get_user_preferences('course_overview_lite_courses_hidden'))) {
+            block_course_overview_lite_update_courses_hidden(unserialize($userpref));
+        }
+        // Transition old user course order preference
+        if (is_null(get_user_preferences('block_course_overview_lite_course_order')) &&
+            !is_null($userpref = get_user_preferences('course_overview_lite_course_order'))) {
+            set_user_preference('block_course_overview_lite_course_order', json_encode(unserialize($userpref)));
+        }
+        // Transition old user course order preference
+        if (is_null(get_user_preferences('block_course_overview_lite_number_of_courses')) &&
+            !is_null($userpref = get_user_preferences('course_overview_lite_number_of_courses'))) {
+            set_user_preference('block_course_overview_lite_number_of_courses', $userpref);
         }
     }
 
