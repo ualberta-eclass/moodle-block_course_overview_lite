@@ -1,0 +1,3 @@
+[submodule "blocks/course_overview_lite"]
+	path = blocks/course_overview_lite
+	url = git@github.com:ualberta-eclass/moodle-block_course_overview_lite.git
